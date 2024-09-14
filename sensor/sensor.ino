@@ -17,10 +17,11 @@
 
 
 //state variables
-bool alert = false;
 float distanceCm = 0;
 
 static SSD1306Wire display(0x3c, 500000, SDA_OLED, SCL_OLED, GEOMETRY_128_64, RST_OLED);  // addr , freq , i2c group , resolution , rst
+
+static TaskHandle_t blinkHandler = NULL;
 
 
 void readSensor(void *p) {
@@ -46,11 +47,9 @@ void readSensor(void *p) {
     display.display();
 
 
-    if (distanceCm < 6) {
-      alert = true;
-    } else {
-      alert = false;
-    }
+    if (distanceCm < 12) {
+     xTaskNotifyGive(blinkHandler);
+     }
 
     vTaskDelay(100 / portTICK_PERIOD_MS);
   }
@@ -59,16 +58,13 @@ void readSensor(void *p) {
 void blink(void *p) {
   while (true) {
 
-    if (alert) {
+    if (ulTaskNotifyTake(pdTRUE,pdMS_TO_TICKS(100))) {
       digitalWrite(pLED, HIGH);
       digitalWrite(pBUZZ, HIGH);
       vTaskDelay(100 / portTICK_PERIOD_MS);
       digitalWrite(pLED, LOW);
       digitalWrite(pBUZZ, LOW);
       vTaskDelay((distanceCm - 1) * 100 / portTICK_PERIOD_MS);
-    } else {
-
-      vTaskDelay(10 / portTICK_PERIOD_MS);
     }
   }
 }
@@ -99,7 +95,7 @@ void setup() {
 
   xTaskCreate(&readSensor, "read sensor", 2048, NULL, 3, NULL);
 
-  xTaskCreate(&blink, "alert", 2048, NULL, 2, NULL);
+  xTaskCreate(&blink, "alert", 2048, NULL, 2, &blinkHandler);
 }
 
 void loop() {
