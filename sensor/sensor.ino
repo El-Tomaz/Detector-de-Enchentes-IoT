@@ -1,12 +1,16 @@
 #include <freertos/freertos.h>
 #include <freertos/task.h>
 
+#include <Wire.h>
+#include "HT_SSD1306Wire.h"
+
+
 //HARDWARE MAPPING
 #define pTRIG 5
 #define pECHO 18
 
 #define pBUZZ 17
-#define pLED 16
+#define pLED 2
 
 //OTHER STUFF
 #define SOUND_SPEED 0.034
@@ -15,6 +19,9 @@
 //state variables
 bool alert = false;
 float distanceCm = 0;
+
+static SSD1306Wire display(0x3c, 500000, SDA_OLED, SCL_OLED, GEOMETRY_128_64, RST_OLED);  // addr , freq , i2c group , resolution , rst
+
 
 void readSensor(void *p) {
   while (1) {
@@ -32,6 +39,12 @@ void readSensor(void *p) {
     // Calculate the distance
     distanceCm = duration * SOUND_SPEED / 2;
     Serial.println(distanceCm);
+    display.clear();
+    display.drawStringMaxWidth(0, 0, 128,
+                               String(distanceCm));
+
+    display.display();
+
 
     if (distanceCm < 6) {
       alert = true;
@@ -66,6 +79,17 @@ void blink(void *p) {
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
+
+  pinMode(Vext, OUTPUT);
+  digitalWrite(Vext, LOW);
+  delay(100);
+
+  display.init();
+  display.setFont(ArialMT_Plain_24);
+  display.setTextAlignment(TEXT_ALIGN_LEFT);
+
+
+
 
   pinMode(pBUZZ, OUTPUT);
   pinMode(pLED, OUTPUT);
