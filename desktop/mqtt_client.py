@@ -1,6 +1,24 @@
 import paho.mqtt.client as mqtt
+import customtkinter as CTK
 
-device_id = input("Insira o id do dispositivo")
+#device_id = input("Insira o id do dispositivo")
+
+main = CTK.CTk()
+main.minsize(420,420)
+
+conec = CTK.CTkLabel(main,text="⬤ mqtt connection", text_color="red")
+conec.pack()
+
+read = CTK.CTkFrame(main)
+read.pack( padx = 16, pady = 16)
+
+lb = CTK.CTkLabel(read, text="Nível da água:", text_color="blue")
+value = CTK.CTkLabel(read,text = "23.5")
+
+lb.grid(column = 0, row = 0, padx = 4, pady = 4)
+value.grid(column = 1, row = 0, padx = 4)
+
+
 
 
 # The callback for when the client receives a CONNACK response from the server.
@@ -8,18 +26,21 @@ def on_connect(client, userdata, flags, reason_code, properties):
     print(f"Connected with result code {reason_code}")
     # Subscribing in on_connect() means that if we lose the connection and
     # reconnect then subscriptions will be renewed.
-    client.subscribe(device_id)
+    client.subscribe("b314-5")
+    conec.configure(text_color = "green")
+
 
 
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
     print(msg.topic+" "+str(msg.payload))
+    value.configure(text = msg.payload)
 
-mqttc = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
+mqttc = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, protocol=mqtt.MQTTv311)
 mqttc.on_connect = on_connect
 mqttc.on_message = on_message
 
-mqttc.connect("mqtt.eclipseprojects.io", 1883, 60)
+mqttc.connect("test.mosquitto.org", 1883, 60)
 
 # Blocking call that processes network traffic, dispatches callbacks and
 # handles reconnecting.
@@ -27,5 +48,6 @@ mqttc.connect("mqtt.eclipseprojects.io", 1883, 60)
 # manual interface.
 
 
-mqttc.loop_forever()
+mqttc.loop_start()
 
+main.mainloop()
