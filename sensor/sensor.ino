@@ -21,8 +21,11 @@ float distanceCm = 0;
 
 static SSD1306Wire display(0x3c, 500000, SDA_OLED, SCL_OLED, GEOMETRY_128_64, RST_OLED);  // addr , freq , i2c group , resolution , rst
 
+<<<<<<< HEAD
 static TaskHandle_t blinkHandler = NULL;
 
+=======
+>>>>>>> 3c818ed59971aea3e7d1d4f51757f55174f8e7e1
 
 void readSensor(void *p) {
   while (1) {
@@ -43,6 +46,12 @@ void readSensor(void *p) {
     display.clear();
     display.drawStringMaxWidth(0, 0, 128,
                                String(distanceCm));
+<<<<<<< HEAD
+=======
+
+    display.display();
+
+>>>>>>> 3c818ed59971aea3e7d1d4f51757f55174f8e7e1
 
     display.display();
 
