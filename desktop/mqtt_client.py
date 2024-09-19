@@ -12,8 +12,8 @@ conec.pack()
 read = CTK.CTkFrame(main)
 read.pack( padx = 16, pady = 16)
 
-lb = CTK.CTkLabel(read, text="Nível da água:", text_color="blue")
-value = CTK.CTkLabel(read,text = "23.5")
+lb = CTK.CTkLabel(read, text="Nível da água:", text_color="blue",font=CTK.CTkFont(size=30))
+value = CTK.CTkLabel(read,text = "23.5",font=CTK.CTkFont(size=30))
 
 lb.grid(column = 0, row = 0, padx = 4, pady = 4)
 value.grid(column = 1, row = 0, padx = 4)
